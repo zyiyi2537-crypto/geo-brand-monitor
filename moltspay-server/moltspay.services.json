@@ -1,0 +1,59 @@
+{
+  "$schema": "https://moltspay.com/schemas/services.json",
+  "provider": {
+    "name": "Vigilath GEO Readiness Checker",
+    "description": "GEO detection and optimization platform",
+    "wallet": "0xb8d6f2441e8f8dfB6288A74Cf73804cDd0484E0C",
+    "chains": ["base"]
+  },
+  "services": [
+    {
+      "id": "membership-detector",
+      "name": "Detector Membership (Monthly)",
+      "description": "Full 25-category GEO check, 20 checks/month",
+      "function": "purchaseMembership",
+      "price": 9.99,
+      "currency": "USDC",
+      "input": {
+        "user_id": { "type": "number", "required": true },
+        "membership_slug": { "type": "string", "required": true }
+      },
+      "output": {
+        "success": { "type": "boolean" },
+        "payment_id": { "type": "string" }
+      }
+    },
+    {
+      "id": "membership-starter",
+      "name": "Starter Membership (Monthly)",
+      "description": "Unlimited checks + optimization suggestions",
+      "function": "purchaseMembership",
+      "price": 999,
+      "currency": "USDC",
+      "input": {
+        "user_id": { "type": "number", "required": true },
+        "membership_slug": { "type": "string", "required": true }
+      },
+      "output": {
+        "success": { "type": "boolean" },
+        "payment_id": { "type": "string" }
+      }
+    },
+    {
+      "id": "membership-growth",
+      "name": "Growth Membership (Monthly)",
+      "description": "Unlimited checks + optimization + paid placement",
+      "function": "purchaseMembership",
+      "price": 2500,
+      "currency": "USDC",
+      "input": {
+        "user_id": { "type": "number", "required": true },
+        "membership_slug": { "type": "string", "required": true }
+      },
+      "output": {
+        "success": { "type": "boolean" },
+        "payment_id": { "type": "string" }
+      }
+    }
+  ]
+}

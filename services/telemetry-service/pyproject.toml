@@ -1,0 +1,14 @@
+[project]
+name = "telemetry-service"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.5.0",
+    "httpx>=0.27.0",
+    "sqlalchemy>=2.0.0",
+    # query 候选聚类用 — 多语言句向量,纯 CPU,~470MB 模型
+    "sentence-transformers>=2.7,<3.0",
+    "torch>=2.2",
+]

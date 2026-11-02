@@ -1,0 +1,29 @@
+fastapi>=0.115.0
+uvicorn[standard]==0.24.0
+pydantic[email]==2.5.0
+pydantic-settings==2.1.0
+python-multipart>=0.0.30
+requests>=2.32.4
+beautifulsoup4==4.12.2
+passlib[bcrypt]==1.7.4
+PyJWT[crypto]>=2.10.1
+sqlalchemy==2.0.23
+alembic==1.13.0
+psycopg[binary]>=3.2
+aiofiles==23.2.1
+aiohttp>=3.14.3
+python-dotenv>=1.2.2
+stripe==9.12.0
+redis>=5.0
+httpx>=0.25.0
+cryptography>=41.0
+playwright>=1.44.0
+apscheduler>=3.10.4
+python-docx>=1.1.0
+pypdf>=4.0.0
+# GEO 优化 Agent(对话式)— Pydantic AI(大脑走 DeepSeek/OpenRouter,OpenAI 兼容)
+# ⚠️ 暂不放主后端 requirements:pydantic-ai>=1.0 需 pydantic>=2.11,而本环境 FastAPI 0.104.1
+#    只兼容 pydantic<2.11(2026-06-04 实测:装它会升 pydantic 到 2.13 → FastAPI 路由解析崩、
+#    后端起不来)。启用 agent 前必须先把 FastAPI 升到兼容 pydantic>=2.11 的版本(≥0.115),
+#    或把 agent 跑在独立 venv/进程(隔离 pydantic 版本)。届时再取消下行注释:
+# pydantic-ai-slim[openai]>=1.0,<2

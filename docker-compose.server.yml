@@ -1,0 +1,139 @@
+# Server deployment stack for the new API-first GEO Monitor.
+# Copy .env.server.example to .env before starting.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-geo_monitor}
+      POSTGRES_USER: ${POSTGRES_USER:-geo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - geo-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-geo} -d ${POSTGRES_DB:-geo_monitor}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - geo-redis:/data
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-geo}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-geo_monitor}
+      REDIS_URL: redis://redis:6379/0
+      BROWSER_SERVICE_CN: http://browser-worker-cn:8091
+      BROWSER_SERVICE_GLOBAL: http://browser-worker-global:8091
+      TELEMETRY_SERVICE_URL: http://telemetry:8095
+    command: ["sh", "-c", "alembic upgrade head && python -m uvicorn geo.main:app --host 0.0.0.0 --port 8070"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "8070:8070"
+    volumes:
+      - geo-reports:/app/reports
+      - geo-backend-data:/app/data
+    restart: unless-stopped
+
+  telemetry:
+    build:
+      context: ./services/telemetry-service
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-geo}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-geo_monitor}
+      REDIS_URL: redis://redis:6379/0
+      BROWSER_SERVICE_CN: http://browser-worker-cn:8091
+      BROWSER_SERVICE_GLOBAL: http://browser-worker-global:8091
+    depends_on:
+      api:
+        condition: service_started
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    expose:
+      - "8095"
+    restart: unless-stopped
+
+  browser-worker-cn:
+    build:
+      context: ./services/browser-service
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+    environment:
+      REGION: ${BROWSER_REGION:-cn}
+      ENGINE_LIST: ${BROWSER_ENGINE_LIST:-deepseek,doubao,qwen,wenxin,yuanbao}
+      MAX_CONCURRENT_QUERIES: ${BROWSER_MAX_CONCURRENT:-2}
+      GEO_BROWSER_BACKGROUND: "1"
+      GEO_BROWSER_PRIVATE_DESKTOP: "1"
+    expose:
+      - "8091"
+    volumes:
+      - geo-browser-data:/app/data
+      - geo-browser-sessions:/app/data/browser_sessions
+    restart: unless-stopped
+
+  browser-worker-global:
+    build:
+      context: ./services/browser-service
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+    environment:
+      REGION: ${BROWSER_GLOBAL_REGION:-global}
+      ENGINE_LIST: ${BROWSER_GLOBAL_ENGINE_LIST:-chatgpt,claude,gemini,grok,copilot}
+      MAX_CONCURRENT_QUERIES: ${BROWSER_GLOBAL_MAX_CONCURRENT:-2}
+      GEO_BROWSER_BACKGROUND: "1"
+      GEO_BROWSER_PRIVATE_DESKTOP: "1"
+    expose:
+      - "8091"
+    volumes:
+      - geo-browser-global-data:/app/data
+      - geo-browser-global-sessions:/app/data/browser_sessions
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.server
+    depends_on:
+      - api
+    ports:
+      - "80:3000"
+    restart: unless-stopped
+
+volumes:
+  geo-postgres:
+  geo-redis:
+  geo-reports:
+  geo-backend-data:
+  geo-browser-data:
+  geo-browser-sessions:
+  geo-browser-global-data:
+  geo-browser-global-sessions:
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,13 @@
+/* TEAM */
+Vigilath — GEO Readiness Checker
+Site: https://www.vigilath.com
+Contact: support [at] zen7.com
+
+/* SITE */
+Last update: 2026-04
+Standards: HTML5, ES2024, CSS3
+Components: React 19, Vite, FastAPI, SQLite
+Software: Python 3.12, Node 20
+
+/* THANKS */
+Open web standards, the llms.txt proposal, the IndexNow initiative, and every team publishing explicit AI crawler manifests.

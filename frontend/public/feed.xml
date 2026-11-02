@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vigilath — GEO &amp; AEO Insights</title>
+    <link>https://www.vigilath.com/</link>
+    <description>AI visibility insights, GEO best practices, and product updates from Vigilath — the unified GEO+AEO platform for global AI visibility.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 19 Apr 2026 14:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.vigilath.com/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>What is Generative Engine Optimization (GEO)?</title>
+      <link>https://www.vigilath.com/geo-knowledge</link>
+      <description>GEO is the practice of making a website discoverable and quotable by AI answer engines like ChatGPT, Perplexity, Claude, and Google AI Overviews. Unlike traditional SEO, GEO optimizes for AI crawl access and for content formats that LLMs prefer to cite. Learn about the 25 categories Vigilath audits and how to improve your AI Visibility Score. Structured data, llms.txt, semantic HTML, and FAQ blocks are among the most impactful GEO signals. Early adopters report up to 40% more AI citations after optimization. Vigilath runs 100+ discrete checks and returns a prioritized fix list so you know exactly where to start.</description>
+      <pubDate>Wed, 16 Apr 2026 10:00:00 +0000</pubDate>
+      <guid>https://www.vigilath.com/geo-knowledge</guid>
+    </item>
+    <item>
+      <title>Vigilath Membership Plans — Free, Pro, Starter, Growth, Scale</title>
+      <link>https://www.vigilath.com/products-services</link>
+      <description>Choose a Vigilath membership plan that fits your AI visibility needs. The Free plan includes 3 basic checks per month. Pro ($9.99/mo) offers 20 full audits with check history. Starter ($999/mo) unlocks unlimited checks and managed GEO coverage. Growth ($2,500/mo) adds paid SEO placements and priority support. Scale is enterprise-grade with custom GEO coverage and a dedicated advisor. All paid plans include the full 25-category AI Visibility Score, category breakdown, and actionable fix recommendations.</description>
+      <pubDate>Mon, 14 Apr 2026 10:00:00 +0000</pubDate>
+      <guid>https://www.vigilath.com/products-services</guid>
+    </item>
+    <item>
+      <title>How AI Crawlers Read Your Website — robots.txt, llms.txt, and .well-known</title>
+      <link>https://www.vigilath.com/geo-knowledge</link>
+      <description>AI crawlers like GPTBot, ClaudeBot, and PerplexityBot identify themselves via User-Agent and expect explicit allow/deny rules in robots.txt. The llms.txt convention provides a machine-readable summary of your site specifically for large language models. The .well-known directory hosts manifests like ai-plugin.json for OpenAI plugins and security.txt for trust signals. Together, these crawl-access signals form the foundation of GEO readiness and directly impact whether AI engines can discover and cite your content.</description>
+      <pubDate>Fri, 11 Apr 2026 10:00:00 +0000</pubDate>
+      <guid>https://www.vigilath.com/geo-knowledge#crawl-access</guid>
+    </item>
+  </channel>
+</rss>

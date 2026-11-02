@@ -1,0 +1,61 @@
+# robots.txt for www.vigilath.com
+# GEO Readiness Checker — the AI-era website audit tool
+
+User-agent: *
+Allow: /
+Disallow: /checkout/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /result
+
+# ---- AI training / answer-engine crawlers (explicitly allowed) ----
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Cohere-ai
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+Sitemap: https://www.vigilath.com/sitemap.xml

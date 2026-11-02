@@ -1,0 +1,16 @@
+{
+  "name": "moltspay-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@coinbase/cdp-sdk": "^1.47.0",
+    "moltspay": "^1.5.0"
+  }
+}

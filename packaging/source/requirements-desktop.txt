@@ -1,0 +1,10 @@
+# Runtime dependencies for the GEO Monitor desktop source.
+# Browser revisions are installed separately by Playwright.
+fastapi==0.143.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.1
+playwright==1.63.0
+playwright-stealth==2.0.3
+patchright==1.63.0
+cloakbrowser==0.6.1
+httpx==0.28.1

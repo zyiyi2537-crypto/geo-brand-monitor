@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:8070/api
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8070:8070"
+    environment:
+      - PYTHONUNBUFFERED=1
+      # backend → sentinel-service 通过容器名解析
+      - SENTINEL_SERVICE_URL=http://sentinel-service:8090
+      # 平台 fallback OpenAI key(scheduler 跑定时任务时用)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on:
+      - sentinel-service
+
+  sentinel-service:
+    build:
+      context: ./services/sentinel-service
+      dockerfile: Dockerfile
+    # 默认仅 backend 内部访问,调试时把下面 ports 放开
+    expose:
+      - "8090"
+    # ports:
+    #   - "8090:8090"
+    volumes:
+      - sentinel-data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SENTINEL_DATA_DIR=/app/data
+      - SENTINEL_PORT=8090
+      # 平台默认 key(client 可用 X-OpenAI-Key header 覆盖)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - BAIDU_COOKIE=${BAIDU_COOKIE:-}
+      # newsnow_hub crawler 调用自托管 newsnow 容器,默认走 service name 解析
+      - NEWSNOW_BASE_URL=http://newsnow:4444
+    depends_on:
+      - newsnow
+    restart: unless-stopped
+
+  # NewsNow 热榜聚合器(42 站) — sentinel-service 的 newsnow_hub crawler 调它
+  # 公开 demo 站(newsnow.busiyi.world)套了 Cloudflare 反爬,必须自托管才稳定
+  # 部分源(微博/抖音/B 站)需要 cookie,通过 env 注入,过期了手动换
+  # 详见 https://github.com/ourongxing/newsnow
+  newsnow:
+    image: ghcr.io/ourongxing/newsnow:latest
+    expose:
+      - "4444"
+    # ports:
+    #   - "4444:4444"   # 调试时放开,浏览器 http://localhost:4444 看 UI
+    environment:
+      # 这些 cookie 只有"想抓那个站完整热榜"才需要;不配也能跑大部分公开源
+      - WEIBO_COOKIE=${WEIBO_COOKIE:-}
+      - DOUYIN_COOKIE=${DOUYIN_COOKIE:-}
+      - BILIBILI_COOKIE=${BILIBILI_COOKIE:-}
+    restart: unless-stopped
+
+volumes:
+  sentinel-data:

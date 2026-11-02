@@ -1,0 +1,21 @@
+Usage                                                                                                                      
+                                                                                                                             
+  # fresh plan, constrained to two domains, with sentiment modifiers                                                         
+  python cli.py monitor --target "宁德时代" --ticker SZ300750 \                                                              
+                        --media media.txt --keywords kw.txt                                                                  
+                                                                                                                             
+  # existing plan, post-filtered + augmented                                                                                 
+  python cli.py monitor --plan-in plan.json --ticker VNET \                                                                  
+                        --media media.txt --keywords kw.txt                                                                  
+                                                                                                                             
+  File format — comma- and/or newline-separated:                                                                             
+  weibo.com, xueqiu.com                                                                                                      
+  reddit.com                                                                                                                 
+                                                                                                                             
+  Behavior                                                                                                                   
+  - --media: passed to the LLM as a hard site: allowlist; on --plan-in, drops queries that don't target an allowed domain    
+  (matches subdomains, e.g. guba.eastmoney.com ✓ for eastmoney.com).                                                         
+  - --keywords: passed to the LLM as modifiers AND'd with target/aliases; on --plan-in, appends (kw1 OR kw2 OR …) to each    
+  query, replacing any trailing modifier group.                                                                              
+                                                                                                                             
+  Files changed: cli.py, search/plan.py, search/__init__.py.                                                                 

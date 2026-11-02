@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>GEO 监测中心</title>
+  <rect width="512" height="512" rx="100" fill="#163A3B"/>
+  <circle cx="226" cy="223" r="137" fill="none" stroke="#F6FAF6" stroke-width="42"/>
+  <path d="M326 324 408 406" fill="none" stroke="#F6FAF6" stroke-width="45" stroke-linecap="round"/>
+  <path d="M163 177h126M163 224h113M163 271h73" fill="none" stroke="#68D5B0" stroke-width="23" stroke-linecap="round"/>
+  <circle cx="291" cy="274" r="16" fill="#F0AD69"/>
+</svg>

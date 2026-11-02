@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Vigilath GEO Checker",
+  "name_for_model": "vigilath_geo_checker",
+  "description_for_human": "Audit any URL for Generative Engine Optimization readiness. Returns an AI visibility score, a 25-category breakdown, and fix recommendations.",
+  "description_for_model": "Plugin for auditing a website's GEO (Generative Engine Optimization) readiness. Given a URL, returns a 0-100 AI visibility score, category-level scores across 25 dimensions (HTTPS, robots.txt, llms.txt, sitemap, semantic HTML, structured data, authority, AI answer formats, etc.), and actionable fix recommendations. Use when the user asks how well a site is optimized for ChatGPT, Perplexity, Claude, or Google AI Overviews.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://www.vigilath.com/.well-known/openai.yaml"
+  },
+  "logo_url": "https://www.vigilath.com/favicon.svg",
+  "contact_email": "support@zen7.com",
+  "legal_info_url": "https://www.vigilath.com/about"
+}

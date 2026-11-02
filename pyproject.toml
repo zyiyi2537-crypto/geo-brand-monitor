@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geo-checker"
+version = "2.1.0"
+description = "Check a website's GEO (Generative Engine Optimization) readiness"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.28",
+    "beautifulsoup4>=4.12",
+]
+keywords = ["geo", "seo", "ai", "llm", "optimization", "crawler", "readiness"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Testing",
+]
+
+[project.scripts]
+# 2026-04-17 refactor: geo_checker is now a package under backend/geo_checker/.
+# The CLI entry targets __main__:main within that package.
+geo-checker = "geo_checker.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/sr007-cxy/Vigilath"
+Issues = "https://github.com/sr007-cxy/Vigilath/issues"
+
+[tool.setuptools.packages.find]
+# The package now lives under backend/geo_checker/, so the package root for
+# discovery is "backend" (where the `geo_checker` package resides).
+where = ["backend"]
+include = ["geo_checker*"]

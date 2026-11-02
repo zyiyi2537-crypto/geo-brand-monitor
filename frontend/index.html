@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>GEO 监测中心</title>
+  <meta name="description" content="管理品牌、监测问题和 AI 平台回答，查看品牌提及、目标文章引用、排名和来源证据。" />
+  <meta name="keywords" content="GEO, AEO, Generative Engine Optimization, Answer Engine Optimization, AI SEO, LLM SEO, ChatGPT visibility, Perplexity SEO, AI search, llms.txt" />
+  <meta name="author" content="Vigilath" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- Google Search Console -->
+  <meta name="google-site-verification" content="REPLACE_WITH_GOOGLE_CODE" />
+  <!-- Bing Webmaster Tools -->
+  <meta name="msvalidate.01" content="REPLACE_WITH_BING_CODE" />
+
+  <link rel="canonical" href="https://www.vigilath.com/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+  <link rel="alternate" type="application/rss+xml" title="Vigilath RSS Feed" href="/feed.xml" />
+
+  <!-- 预加载首屏 logo 的 webp(46 KB,Home.tsx + Header.tsx 都用到)。
+       SVG 矢量 logo,所有现代浏览器原生支持. -->
+  <link rel="preload" href="/image/logo.svg" as="image" type="image/svg+xml" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Vigilath" />
+  <meta property="og:title" content="Vigilath — Unified GEO+AEO for Global AI Visibility" />
+  <meta property="og:description" content="Vigilath is the unified GEO+AEO platform for global AI visibility. Audit any website and get a 0–100 AI Visibility Score, a 25-category breakdown, and an actionable fix list for ChatGPT, Perplexity, Claude, and Google AI Overviews." />
+  <meta property="og:url" content="https://www.vigilath.com/" />
+  <meta property="og:image" content="https://www.vigilath.com/favicon.svg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@zen7_labs" />
+  <meta name="twitter:creator" content="@zen7_labs" />
+  <meta name="twitter:title" content="Vigilath — Unified GEO+AEO for Global AI Visibility" />
+  <meta name="twitter:description" content="Vigilath is the unified GEO+AEO platform for global AI visibility. Audit any website and see where you stand with ChatGPT, Perplexity, Claude, and Google AI Overviews." />
+  <meta name="twitter:image" content="https://www.vigilath.com/favicon.svg" />
+
+  <!-- Alternate language -->
+  <link rel="alternate" hreflang="en" href="https://www.vigilath.com/" />
+  <link rel="alternate" hreflang="zh" href="https://www.vigilath.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://www.vigilath.com/" />
+
+  <!-- Structured data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Vigilath",
+    "alternateName": "Vigilath GEO+AEO Platform",
+    "url": "https://www.vigilath.com/",
+    "logo": "https://www.vigilath.com/favicon.svg",
+    "description": "Vigilath is the unified GEO+AEO platform for global AI visibility. It audits any website across 25 categories to measure its visibility to ChatGPT, Perplexity, Claude, and Google AI Overviews.",
+    "foundingDate": "2025",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "San Francisco",
+      "addressRegion": "CA",
+      "addressCountry": "US"
+    },
+    "sameAs": [
+      "https://x.com/zen7_labs",
+      "https://discord.gg/mJVEVXyxD5",
+      "https://www.instagram.com/vigilath",
+      "https://www.reddit.com/r/vigilath"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "support@zen7.com",
+      "contactType": "customer support",
+      "availableLanguage": ["English", "Chinese"]
+    }
+  }
+  </script>
+
+  <!-- Structured data: WebSite with SearchAction -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Vigilath",
+    "url": "https://www.vigilath.com/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.vigilath.com/checker?url={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Structured data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Generative Engine Optimization (GEO)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "GEO is the practice of making a website discoverable and quotable by AI answer engines like ChatGPT, Perplexity, Claude, and Google AI Overviews. Unlike traditional SEO, GEO optimizes for both AI crawl access (explicit robots.txt rules for GPTBot, ClaudeBot, PerplexityBot) and for content formats that LLMs prefer to cite (definitions, lists, tables, FAQs, quotable statistics)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Vigilath audit a website?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Vigilath runs 100+ discrete checks across 25 categories: HTTPS, robots.txt, llms.txt, sitemap.xml, .well-known manifests, platform registration, meta tags, Open Graph, JSON-LD structured data, semantic HTML, heading structure, content extractability, content quality, technical crawlability, security headers, authority signals, brand entity knowledge graphs, trust & safety signals, cross-platform presence, and AI answer-format readiness. The result is a 0–100 AI Visibility Score with a letter grade, a category-by-category breakdown, and an actionable list of fixes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is server-side content important for AI crawlers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Most AI crawlers — including GPTBot, ClaudeBot, and PerplexityBot — do not execute JavaScript. A pure client-side-rendered SPA appears almost empty to them, which means LLMs never see the content and cannot cite it. Adding server-side rendering, static-site generation, or a content-rich index.html fixes this."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which AI bots should I allow in robots.txt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "At minimum: GPTBot and ChatGPT-User (OpenAI), OAI-SearchBot (ChatGPT search), Google-Extended (Gemini + AI Overviews), ClaudeBot and anthropic-ai (Claude), PerplexityBot and Perplexity-User (Perplexity), Applebot-Extended (Apple Intelligence), CCBot (Common Crawl, used as LLM training source), and Meta-ExternalAgent. Explicit allow rules are a stronger signal than relying on wildcard fallback."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Structured data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Vigilath",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "url": "https://www.vigilath.com/",
+    "description": "Vigilath is the unified GEO+AEO platform that audits any website across 25 categories and 100+ signals to produce a 0–100 AI Visibility Score for ChatGPT, Perplexity, Claude, and Google AI Overviews.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Free plan with 3 checks per month"
+    }
+  }
+  </script>
+
+  <!-- Structured data: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.vigilath.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "GEO Knowledge",
+        "item": "https://www.vigilath.com/geo-knowledge"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Products & Services",
+        "item": "https://www.vigilath.com/products-services"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "About",
+        "item": "https://www.vigilath.com/about"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "Contact",
+        "item": "https://www.vigilath.com/contact"
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    /* Critical CSS — 在主 CSS bundle 到位前给出"页面在加载"的视觉,避免白屏刺眼。
+       颜色匹配默认 peec 主题的 --bg-primary / --text-primary。 */
+    html, body {
+      margin: 0;
+      background: #f5f5f7;
+      color: #0a0a0a;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* 隐藏静态 SEO 骨架,避免 React 挂载前出现 FOUC。
+       AI 爬虫(GPTBot/ClaudeBot/PerplexityBot 等)不执行 CSS,仍可抓到 #seo-skeleton 内容。 */
+    #seo-skeleton { display: none; }
+
+    /* 启动骨架——给真实用户看,消灭手机端 2-3s 白屏。内联 CSS 与 HTML
+       同步到达,不等主 bundle;React createRoot.render 挂载 <App /> 时会把
+       #root 下的所有内容(包括这个骨架和上面的 SEO 骨架)一起替换,无需
+       手动清理。 */
+    #app-boot-skeleton { min-height: 100vh; display: flex; flex-direction: column; }
+    #app-boot-skeleton .sk-header {
+      height: 64px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    #app-boot-skeleton .sk-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #app-boot-skeleton .sk-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-top-color: #0ea5e9;
+      border-radius: 50%;
+      animation: sk-spin 1s linear infinite;
+    }
+    @keyframes sk-spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body>
+  <!-- #root 下有两个兄弟骨架,React createRoot.render 挂载时整块替换:
+       - #app-boot-skeleton:对人类可见,头部条 + 中央 spinner,消除白屏
+       - #seo-skeleton:对人类 display:none,给不跑 JS 的 AI 爬虫抓语义内容 -->
+  <div id="root">
+    <div id="app-boot-skeleton" role="status" aria-label="Loading">
+      <div class="sk-header" aria-hidden="true"></div>
+      <div class="sk-center" aria-hidden="true"><div class="sk-spinner"></div></div>
+    </div>
+    <div id="seo-skeleton">
+    <header>
+      <nav aria-label="Primary">
+        <a href="/" rel="home"><strong>Vigilath</strong></a>
+        <ul>
+          <li><a href="/checker">Run a check</a></li>
+          <li><a href="/geo-knowledge">GEO knowledge</a></li>
+          <li><a href="/products-services">Products &amp; services</a></li>
+          <li><a href="/membership">Membership</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article>
+        <h1>Vigilath — Unified GEO+AEO for Global AI Visibility</h1>
+
+        <section aria-labelledby="key-takeaways">
+          <h2 id="key-takeaways">Key Takeaways</h2>
+          <ul>
+            <li><dfn>Vigilath</dfn> is the unified <abbr title="Generative Engine Optimization">GEO</abbr>+<abbr title="Answer Engine Optimization">AEO</abbr> platform for global AI visibility.</li>
+            <li>Audit any website across 25 categories and 100+ signals for a 0–100 AI Visibility Score.</li>
+            <li>Covers ChatGPT, Perplexity, Claude, Google AI Overviews, Copilot, and other <abbr title="Large Language Model">LLM</abbr> answer engines.</li>
+            <li>According to a <a href="https://arxiv.org/abs/2311.09735" rel="noopener">2024 study by Georgia Tech researchers</a>, websites optimized for generative engines receive up to 40% more AI citations.</li>
+          </ul>
+        </section>
+
+        <p>
+          <strong>Vigilath</strong> is the unified GEO+AEO platform for global AI visibility.
+          Audit any website across 25 categories and 100+ signals to see how visible, quotable,
+          and citable it is to ChatGPT, Perplexity, Claude, Google AI Overviews, and Copilot.
+          You get a 0–100 AI Visibility Score, a letter grade, a category breakdown, and a
+          prioritized fix list. According to <a href="https://www.w3.org/standards/" rel="noopener">W3C web standards</a>, semantic HTML and structured data are foundational to machine-readable content.
+        </p>
+
+        <section aria-labelledby="what-is-geo">
+          <h2 id="what-is-geo">What is Generative Engine Optimization?</h2>
+          <p>
+            <dfn>Generative Engine Optimization</dfn> (<abbr title="Generative Engine Optimization">GEO</abbr>) is the practice of making a website legible and attractive to the retrieval and
+            citation layer of large language models. Unlike traditional <abbr title="Search Engine Optimization">SEO</abbr> — which optimizes
+            for a keyword-based ranking algorithm — GEO optimizes for two things: AI crawl
+            access and quotability by <abbr title="Large Language Models">LLMs</abbr>.
+            As noted by the <a href="https://schema.org/" rel="noopener">Schema.org</a> initiative, structured data markup helps search engines and AI systems understand page content more effectively.
+          </p>
+          <ul>
+            <li><strong>Crawl access</strong> — explicit allow/deny rules for GPTBot, ClaudeBot, PerplexityBot, Google-Extended, and 12 other AI bots in <code>robots.txt</code>; machine-readable manifests in <code>.well-known/</code>; a complete <code>sitemap.xml</code>; the <code>llms.txt</code> convention.</li>
+            <li><strong>Quotability</strong> — semantic HTML, clean heading structure, JSON-LD structured data, canonical URLs, authorship signals, and content shapes LLMs prefer to cite (definitions, lists, comparison tables, step-by-step instructions, FAQ blocks, quotable statistics).</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="geo-vs-seo">
+          <h2 id="geo-vs-seo">GEO vs. Traditional SEO</h2>
+          <table>
+            <thead>
+              <tr><th>Dimension</th><th>Traditional SEO</th><th>GEO (Generative Engine Optimization)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Target</td><td>Google / Bing keyword rankings</td><td>AI answer engines (ChatGPT, Perplexity, Claude, Gemini)</td></tr>
+              <tr><td>Optimization unit</td><td>Keywords &amp; backlinks</td><td>Quotability &amp; AI-crawl access</td></tr>
+              <tr><td>Key signals</td><td>PageRank, domain authority, anchor text</td><td>Structured data, llms.txt, semantic HTML, FAQ blocks</td></tr>
+              <tr><td>Content format</td><td>Long-form articles for SERP snippets</td><td>Definitions, tables, step-by-step, pros/cons — passage-level citations</td></tr>
+              <tr><td>Measurement</td><td>Rank position, CTR, organic traffic</td><td>AI Visibility Score, citation frequency, answer inclusion rate</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section aria-labelledby="what-we-check">
+          <h2 id="what-we-check">What Vigilath checks</h2>
+          <p>Each audit runs through 25 categories grouped into five themes:</p>
+          <ol>
+            <li><strong>Crawl access</strong> — HTTPS, robots.txt, llms.txt, sitemap.xml, .well-known manifests, IndexNow.</li>
+            <li><strong>Content extractability</strong> — SSR vs. client-rendered, content-to-HTML ratio, semantic tags, heading structure, internal links.</li>
+            <li><strong>Meta &amp; structured data</strong> — title, description, canonical, Open Graph, Twitter card, JSON-LD (Organization, WebSite, FAQ, HowTo, Breadcrumbs).</li>
+            <li><strong>Authority &amp; trust</strong> — security headers, author attribution, brand entity knowledge graphs, trust &amp; safety signals, sameAs profile links, cross-platform presence.</li>
+            <li><strong>Answer-format readiness</strong> — definitions, step-by-step, comparison tables, pros/cons, TL;DR, FAQs, quotable stats.</li>
+          </ol>
+        </section>
+
+        <section aria-labelledby="pros-cons">
+          <h2 id="pros-cons">Pros and Cons of GEO Optimization</h2>
+          <h3>Pros</h3>
+          <ul>
+            <li>Increases brand visibility in AI-generated answers across ChatGPT, Perplexity, Claude, and Google AI Overviews</li>
+            <li>Complements existing SEO — most GEO fixes also improve traditional search rankings</li>
+            <li>Measurable with a 0–100 AI Visibility Score and 25-category breakdown</li>
+            <li>Early-mover advantage — fewer than 5% of websites are currently GEO-optimized</li>
+          </ul>
+          <h3>Cons</h3>
+          <ul>
+            <li>Requires ongoing monitoring as AI crawlers and citation algorithms evolve</li>
+            <li>Some checks (AI citation, entity audit) require paid API keys</li>
+            <li>Brand entity signals (Wikipedia, Wikidata) take time to build organically</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="plans">
+          <h2 id="plans">Membership plans</h2>
+          <p>Pick a tier that matches how you use AI visibility data:</p>
+          <table>
+            <thead>
+              <tr><th>Plan</th><th>Price</th><th>Checks / month</th><th>Key features</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Free</td><td>$0</td><td>3</td><td>Basic 25-category audit</td></tr>
+              <tr><td>Pro</td><td>$9.99/mo</td><td>20</td><td>Full audit, check history, fix list</td></tr>
+              <tr><td>Starter</td><td>$999/mo</td><td>Unlimited</td><td>Managed GEO, AI inclusion spec, copywriting compliance</td></tr>
+              <tr><td>Growth</td><td>$2,500/mo</td><td>Unlimited</td><td>Starter + paid SEO placements, priority support</td></tr>
+              <tr><td>Scale</td><td>Custom</td><td>Unlimited</td><td>Enterprise GEO, reputation management, dedicated advisor</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section aria-labelledby="cta">
+          <h2 id="cta">Ready to measure your AI visibility?</h2>
+          <p>
+            <a href="/checker">Run a free Vigilath audit</a> on any URL, or
+            <a href="/geo-knowledge">browse the GEO knowledge base</a> to understand what
+            the 25 categories mean and how LLMs actually pick what to cite.
+          </p>
+        </section>
+      </article>
+    </main>
+
+    <nav aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+      </ol>
+    </nav>
+
+    <footer>
+      <p>
+        <small>
+          © Vigilath — Unified GEO+AEO for Global AI Visibility.
+          <a href="/sitemap.xml">Sitemap</a> ·
+          <a href="/robots.txt">robots.txt</a> ·
+          <a href="/llms.txt">llms.txt</a> ·
+          <a href="/about">About</a> ·
+          <a href="/contact">Contact</a> ·
+          <a href="/privacy">Privacy Policy</a> ·
+          <a href="/terms">Terms of Service</a> ·
+          <a href="/cookie-policy">Cookie Policy</a> ·
+          <a href="https://x.com/zen7_labs" rel="noopener">X / Twitter</a>
+        </small>
+      </p>
+    </footer>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

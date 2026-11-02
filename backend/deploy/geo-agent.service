@@ -1,0 +1,18 @@
+# systemd 单元:GEO 优化 Agent 独立 service(方案 B)。
+# 安装:cp 到 /etc/systemd/system/geo-agent.service && systemctl daemon-reload && systemctl enable --now geo-agent
+# 字段按 geo-backend.service 实际(User/EnvironmentFile 路径)对齐调整。
+[Unit]
+Description=Vigilath GEO Agent Service (Pydantic AI + DeepSeek)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/geo/backend
+EnvironmentFile=/opt/geo/backend/.env
+# 独立 venv(pydantic>=2.11 + pydantic-ai),与主后端隔离
+ExecStart=/opt/geo/agent-venv/bin/uvicorn geo.agent.service:app --host 127.0.0.1 --port 8010
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
