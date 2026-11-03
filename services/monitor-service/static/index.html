@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEO 品牌监测</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--line:#e3e8ef;--text:#1c2733;--muted:#66788c;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--amber:#d97706}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:920px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.card h2{font-size:15px;margin:0 0 12px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font:inherit;background:#fff}
+textarea{min-height:72px;resize:vertical}
+.hint{color:var(--muted);font-size:12px;margin:4px 0 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+button{padding:8px 16px;border:1px solid var(--line);border-radius:7px;background:#fff;font:inherit;cursor:pointer}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.pill.ok{background:#dcfce7;color:var(--green)} .pill.bad{background:#fee2e2;color:var(--red)}
+.pill.run{background:#dbeafe;color:var(--blue)} .pill.wait{background:#fef3c7;color:var(--amber)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px}
+th{color:var(--muted);font-weight:600}
+a{color:var(--blue)}
+#msg{margin:8px 0;padding:10px 12px;border-radius:7px;display:none}
+#msg.err{display:block;background:#fee2e2;color:var(--red)}
+#msg.ok{display:block;background:#dcfce7;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>GEO 品牌监测</h1>
+  <p class="sub">目标品牌在 DeepSeek、豆包、元宝、文心一言、通义千问的回答中的提及与文章引用核对</p>
+
+  <div class="card">
+    <h2>平台就绪状态</h2>
+    <div id="platforms" class="row">加载中……</div>
+  </div>
+
+  <div class="card">
+    <h2>新建监测任务</h2>
+    <label>目标品牌</label>
+    <input id="brand" placeholder="例：度亘光电">
+    <label>已发布文章链接（每行一条，格式：标题|网址，或只写网址）</label>
+    <textarea id="articles" placeholder="度亘光电发布新一代激光器|https://www.toutiao.com/article/123456"></textarea>
+    <label>关键词 / 主题（每行一个，用于生成核对问题）</label>
+    <textarea id="keywords" placeholder="高功率光纤激光器&#10;激光雷达光源供应商"></textarea>
+    <label>核对问题（每行一个；留空可点“生成核对问题”）</label>
+    <textarea id="questions" placeholder="高功率光纤激光器哪家国产品牌做得好？"></textarea>
+    <div class="row">
+      <button id="btnGen">生成核对问题</button>
+      <button id="btnRun" class="primary">开始监测</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>监测任务</h2>
+    <div id="msg"></div>
+    <table>
+      <thead><tr><th>品牌</th><th>进度</th><th>状态</th><th>创建时间</th><th>报告</th></tr></thead>
+      <tbody id="jobs"><tr><td colspan="5" class="hint">暂无任务</td></tr></tbody>
+    </table>
+    <div class="row"><button id="btnRefresh">刷新列表</button></div>
+  </div>
+</div>
+
+<script>
+const q = new URLSearchParams(location.search);
+let token = q.get('token') || sessionStorage.getItem('geo_token') || '';
+if (q.get('token')) sessionStorage.setItem('geo_token', q.get('token'));
+
+// Parent pages can hand the token via postMessage after load instead of URL.
+addEventListener('message', e => {
+  if (e.data && e.data.type === 'geo-token' && typeof e.data.token === 'string') {
+    token = e.data.token;
+    sessionStorage.setItem('geo_token', token);
+    refreshAll();
+  }
+});
+
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    ...options,
+    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, ...(options.headers || {})},
+  });
+  if (res.status === 401) {
+    document.body.innerHTML = '<div class="wrap"><div class="card">登录已失效，请从订阅网站重新进入。</div></div>';
+    throw new Error('unauthorized');
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail || ('请求失败 ' + res.status));
+  return data;
+}
+
+function show(text, ok) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = ok ? 'ok' : 'err';
+}
+
+function statusPill(s) {
+  const map = {queued: ['wait','排队中'], running: ['run','进行中'], done: ['ok','已完成'], failed: ['bad','失败']};
+  const [cls, label] = map[s] || ['wait', s];
+  return `<span class="pill ${cls}">${label}</span>`;
+}
+
+async function refreshPlatforms() {
+  const box = document.getElementById('platforms');
+  try {
+    const data = await api('/api/platform-status');
+    if (!data.platforms.length) { box.textContent = '平台状态暂不可用'; return; }
+    box.innerHTML = data.platforms.map(p =>
+      `<span class="pill ${p.ready ? 'ok' : 'bad'}">${p.engine} · ${p.label}</span>`).join('');
+  } catch (e) { box.textContent = '平台状态暂不可用'; }
+}
+
+async function refreshJobs() {
+  const body = document.getElementById('jobs');
+  try {
+    const data = await api('/api/jobs');
+    if (!data.jobs.length) { body.innerHTML = '<tr><td colspan="5" class="hint">暂无任务</td></tr>'; return; }
+    body.innerHTML = data.jobs.map(j => `<tr>
+      <td>${j.brand}</td>
+      <td>${j.completed_questions}/${j.total_questions}</td>
+      <td>${statusPill(j.status)}${j.error ? `<div class="hint">${j.error}</div>` : ''}</td>
+      <td>${(j.created_at || '').replace('T',' ').slice(0,16)}</td>
+      <td>${j.report_ready ? `<a href="/api/jobs/${j.id}/report?token=${encodeURIComponent(token)}" target="_blank">查看报告</a>` : '<span class="hint">生成中</span>'}</td>
+    </tr>`).join('');
+  } catch (e) { show(e.message, false); }
+}
+
+function parseArticles() {
+  return document.getElementById('articles').value.split('\n')
+    .map(l => l.trim()).filter(Boolean).map(l => {
+      const i = l.indexOf('|');
+      return i > 0 ? {title: l.slice(0, i).trim(), url: l.slice(i + 1).trim()} : {title: '', url: l};
+    });
+}
+function parseLines(id) {
+  return document.getElementById(id).value.split('\n').map(l => l.trim()).filter(Boolean);
+}
+
+document.getElementById('btnGen').onclick = async () => {
+  const brand = document.getElementById('brand').value.trim();
+  if (!brand) return show('请先填写目标品牌', false);
+  try {
+    show('正在生成核对问题……', true);
+    const data = await api('/api/questions/generate', {method: 'POST', body: JSON.stringify({
+      brand, article_urls: parseArticles().map(a => a.url), keywords: parseLines('keywords'),
+    })});
+    document.getElementById('questions').value = data.questions.join('\n');
+    show(`已生成 ${data.questions.length} 个问题，可编辑后开始监测`, true);
+  } catch (e) { show(e.message, false); }
+};
+
+document.getElementById('btnRun').onclick = async () => {
+  const brand = document.getElementById('brand').value.trim();
+  const questions = parseLines('questions');
+  const articles = parseArticles();
+  if (!brand) return show('请填写目标品牌', false);
+  if (!questions.length) return show('请填写或生成核对问题', false);
+  if (!articles.length) return show('请填写已发布文章链接', false);
+  try {
+    await api('/api/jobs', {method: 'POST', body: JSON.stringify({brand, articles, questions})});
+    show('任务已创建，开始监测', true);
+    refreshJobs();
+  } catch (e) { show(e.message, false); }
+};
+
+document.getElementById('btnRefresh').onclick = () => { refreshJobs(); refreshPlatforms(); };
+refreshAll();
+function refreshAll() { refreshJobs(); refreshPlatforms(); }
+setInterval(refreshJobs, 5000);
+</script>
+</body>
+</html>

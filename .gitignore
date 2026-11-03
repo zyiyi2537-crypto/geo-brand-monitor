@@ -173,3 +173,8 @@ play_snapshot.sh
 !.env.example
 !.env.*.example
 AGENTS.md
+
+# monitor-service runtime artifacts
+services/monitor-service/tmp-reports/
+services/monitor-service/tmp-data/
+services/monitor-service/data/
