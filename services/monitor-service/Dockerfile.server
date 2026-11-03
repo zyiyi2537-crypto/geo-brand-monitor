@@ -1,8 +1,8 @@
 # Server image for the embeddable GEO monitor module.
-# Build context is the repo root so the desktop pipeline (tools/) is included.
+# Build context is the repo root so the shared monitoring pipeline is included.
 FROM python:3.12-slim
 WORKDIR /srv
-ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 MONITOR_DATA_DIR=/srv/data MONITOR_REPORTS_DIR=/srv/reports
 COPY services/monitor-service/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY tools ./tools

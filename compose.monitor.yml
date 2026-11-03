@@ -1,0 +1,48 @@
+# Dedicated five-platform GEO server. No legacy backend or desktop UI is started.
+services:
+  monitor:
+    build:
+      context: .
+      dockerfile: services/monitor-service/Dockerfile.server
+    env_file: .env.monitor
+    environment:
+      MONITOR_BROWSER_URL: http://browser:8091
+      MONITOR_DATA_DIR: /srv/data
+      MONITOR_REPORTS_DIR: /srv/reports
+      MONITOR_WORKERS: "1"
+    ports:
+      - "127.0.0.1:${MONITOR_PORT:-8080}:8080"
+    volumes:
+      - monitor-data:/srv/data
+      - monitor-reports:/srv/reports
+    depends_on:
+      browser:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+  browser:
+    build:
+      context: services/browser-service
+      dockerfile: Dockerfile.server
+    environment:
+      REGION: cn
+      ENGINE_LIST: deepseek,doubao,yuanbao,wenxin,qwen
+      MAX_CONCURRENT_QUERIES: "1"
+    shm_size: 1gb
+    volumes:
+      - browser-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8091/engines', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    restart: unless-stopped
+volumes:
+  monitor-data:
+  monitor-reports:
+  browser-data:

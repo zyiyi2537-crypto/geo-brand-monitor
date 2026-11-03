@@ -1,8 +1,10 @@
 # monitor-service — 可嵌入的 GEO 品牌监测模块
 
-把桌面端 GEO 监测核心（五平台真实浏览器采集 + AI 判定 + 报告）包装成可部署到服务器、
-可嵌入订阅网站的多租户服务。**监测口径与桌面端完全一致**：是否提及、是否引用、
-品牌评价全部由配置的 AI 模型判定，脚本只做证据校验（逐字摘录、URL 真实性）。
+部署到服务器、可嵌入订阅网站的多租户 GEO 监测服务。服务器负责五平台浏览器采集、AI 判定与报告生成，客户通过网页访问。
+是否提及、是否引用、品牌评价由配置的 AI 模型判定，脚本校验证据（逐字摘录、URL 来源）。
+
+服务器部署入口为根目录 `compose.monitor.yml` 和 `.env.monitor.example`，步骤见根目录 README。
+目前已通过模拟上游端到端测试，Linux 镜像构建和真实五平台采集尚待验证。
 
 ## 架构
 
@@ -19,15 +21,15 @@ monitor-service (本服务, 端口 8080)
    browser-service:8091（五平台登录态，运营资产）
 ```
 
-## 与桌面端的对应关系
+## 服务器执行模块
 
-| 桌面端 | 服务端 |
+| 共享模块 | 服务端用途 |
 |---|---|
-| `tools/geo_record.collect_results` 采集编排 | 原样调用 |
-| `tools/ai_verifier.verify_question` AI 判定 | 原样调用（合并判定→失败逐平台兜底） |
-| `tools/geo_record.save_run_progress` 增量报告 | 原样调用（中途失败保留阶段性报告） |
-| `tools/agent_planner.generate_questions` 出题 | `/api/questions/generate` |
-| `geo_monitor_gui.pyw` Tkinter 界面 | `/app/` 静态页 + 订阅网站身份桥 |
+| `tools/geo_record.collect_results` | 五平台采集编排 |
+| `tools/ai_verifier.verify_question` | AI 判定，失败时逐平台兜底 |
+| `tools/geo_record.save_run_progress` | 增量报告，中途失败保留已完成结果 |
+| `tools/agent_planner.generate_questions` | `/api/questions/generate` 问题生成 |
+| `static/index.html` | `/app/` 网页工作台 |
 
 Vigilath 的 `backend/geo/api/unified.py`（脚本正则判定、API 引擎）**不在本服务链路内**。
 

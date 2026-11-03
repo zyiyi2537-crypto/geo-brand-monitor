@@ -1,86 +1,58 @@
-# GEO 品牌监测中心
+# GEO 品牌监测服务器
 
-GEO 品牌监测中心（`geo-brand-monitor`）：监测目标品牌与已发布文章在 **DeepSeek、豆包、元宝、文心一言、通义千问** 回答中的提及、排名、引用来源与品牌评价，生成带问题明细、引用证据和饼图的报告。
+面向客户、可嵌入现有订阅网站的 GEO 监测服务源码。部署到 Linux 服务器后，客户通过网页提交品牌、文章链接和问题，服务器采集 DeepSeek、豆包、元宝、文心一言、通义千问的网页回答，再由配置的 AI 模型判断品牌提及、文章引用、评价与证据，生成报告。
 
-**判定口径**：品牌是否提及、文章是否引用、品牌评价全部由配置的 AI 模型判定（判定结果必须附逐字证据，脚本校验证据真实性），不是脚本关键词匹配。
+运行入口是 FastAPI 服务和浏览器采集容器。用户无需安装 Windows 程序；注册、订阅与收费由接入网站负责。
 
-## 产品形态
+## 服务器部署
 
-### 桌面版（Windows）
-
-入口 `GEO-Monitor.pyw`。浏览器登录五个平台，用同一批问题真实采集回答与引用来源，再由配置的模型逐题判定。品牌、文章链接、问题、登录态和历史报告保存在本机，报告为 `record.html` / `record.md` / `results.json`。
-
-使用说明见 [QUICKSTART.md](QUICKSTART.md)。
-
-### 服务端嵌入模块（monitor-service）
-
-[`services/monitor-service/`](services/monitor-service/)：把桌面端监测核心（五平台浏览器采集 + AI 判定 + 报告）包装为可部署到服务器、可 iframe 嵌入订阅网站的**多租户服务**。
-
-- 账号与收费由订阅网站负责：主站签发 HS256 JWT，模块按 `tenant_id` 隔离任务与报告
-- 可选配额钩子：提交任务时回调主站校验额度（计费单位：1 问题 = 5 次平台采集 + 1 次 AI 判定）
-- 五平台登录态与判定模型 Key 是运营资产，只存在于服务端
-- 判定与报告口径与桌面版完全一致
-
-接入方法（token 签发、iframe、配额协议、环境变量、Docker）见 [services/monitor-service/README.md](services/monitor-service/README.md)。
-
-## 仓库结构
-
-| 路径 | 说明 |
-| --- | --- |
-| `geo_monitor_gui.pyw` / `GEO-Monitor.pyw` | 桌面版界面与入口 |
-| `tools/` | 监测核心：采集编排（`geo_record`）、AI 判定（`ai_verifier`）、出题（`agent_planner`）、报告趋势 |
-| `services/browser-service/` | 五平台 Playwright 采集服务（含登录态管理、扫码授权、服务器镜像） |
-| `services/monitor-service/` | 服务端嵌入模块（FastAPI，多租户） |
-| `services/telemetry-service/` | 报告渲染（`qualified_report`）与品牌提及聚合 |
-| `reports/` | 本地监测报告（`geo-record-*`） |
-| `frontend/` / `backend/` | 上游 Vigilath 平台（GEO 审计引擎、历史 Web 工作台），非当前监测链路 |
-| `docs/` | 架构、部署、运维文档 |
-
-注意：`backend/geo/api/unified.py` 的旧 Web 工作台使用平台 API + 脚本正则判定，与桌面版 AI 判定口径不同，数据不可直接比较；新的服务端方案以 `monitor-service` 为准。
-
-## 快速开始
-
-桌面版依赖与运行见 [QUICKSTART.md](QUICKSTART.md)。服务端模块本地运行：
-
-```powershell
-cd services/monitor-service
-python -m venv venv
-venv\Scripts\pip install -r requirements.txt
-$env:MONITOR_JWT_SECRET = "<与主站共享的密钥>"
-$env:MONITOR_ADMIN_TOKEN = "<运营令牌>"
-$env:GEO_AI_BASE_URL = "https://api.example.com/v1"
-$env:GEO_AI_MODEL = "<模型名>"
-$env:GEO_AI_API_KEY = "<判定模型 Key>"
-venv\Scripts\uvicorn monitor_service.main:app --port 8080
-```
-
-上游 Vigilath 的 CLI 审计（`geo-checker`）与 Web 应用仍可独立运行，见 [docs/README.md](docs/README.md)。
-
-## 安全与部署
-
-- 判定模型 Key、平台登录态、数据库口令等只放被忽略的本地环境文件或密钥管理器，不进仓库
-- 服务端部署置于 HTTPS 反向代理之后；对外服务必须开启鉴权与配额
-- 上游历史凭据已在改写 Git 历史时移除；分发副本前请删除旧克隆、备份与缓存
-- 漏洞报告见 [SECURITY.md](SECURITY.md)
-
-## 开发
+需要 Linux、Docker Engine 和 Docker Compose v2。在仓库根目录执行：
 
 ```bash
-python -m pytest
-cd frontend && npm run lint && npm run build
+cp .env.monitor.example .env.monitor
+# Edit .env.monitor: set JWT secret, admin token, model endpoint, model name and API key.
+docker compose --env-file .env.monitor -f compose.monitor.yml up -d --build
+docker compose --env-file .env.monitor -f compose.monitor.yml ps
+curl http://127.0.0.1:8080/healthz
 ```
 
-贡献规范见 [CONTRIBUTING.md](CONTRIBUTING.md)。审计引擎的可修改副本为 `backend/geo_checker/`，规则见 [CLAUDE.md](CLAUDE.md)。
+通过 HTTPS 反向代理转发到 `127.0.0.1:8080`。工作台地址为 `/app/`，API 文档为 `/docs`。主站必须签发有效用户 JWT，工作台获得身份后才可提交任务。
 
-## 上游致谢与许可证
+部署配置：[compose.monitor.yml](compose.monitor.yml)；环境变量模板：[.env.monitor.example](.env.monitor.example)。此编排只启动 `monitor` 和 `browser` 两个服务，不依赖旧 Web 后端。
 
-本项目的审计引擎与部分基础设施代码派生自 [Vigilath](https://github.com/sr007-cxy/Vigilath)（Zen7 Labs，MIT License）。依 MIT 条款保留其版权声明与许可证全文，见 [LICENSE](LICENSE)；相关上游文档一并保留在 `docs/`。
+## 运行结构
 
-```bibtex
-@software{vigilath,
-  author    = {Zen7 Labs},
-  title     = {Vigilath: GEO and AI Visibility Platform},
-  publisher = {GitHub},
-  url       = {https://github.com/sr007-cxy/Vigilath}
-}
+```text
+订阅网站 → 用户 JWT → 监测工作台 / 用户 API
+                         ↓
+                  任务队列与租户数据
+                         ↓
+               五平台浏览器采集服务
+                         ↓
+                  AI 判定与证据校验
+                         ↓
+                    增量报告
 ```
+
+- `services/monitor-service/`：用户接口、任务队列、租户隔离、报告访问和网页工作台。
+- `services/browser-service/`：服务器上的五平台浏览器与登录态管理。
+- `tools/`：服务调用的采集编排、AI 判定与问题生成逻辑。
+- `services/telemetry-service/app/`：报告渲染所需的共享模块；无需额外启动 telemetry 服务。
+
+订阅网站对接、JWT 签发和配额接口见 [模块接入说明](services/monitor-service/README.md)。HS256 共享密钥是当前实现的接入协议，实际主站需按此协议对接或适配。
+
+## 数据与登录态
+
+Compose 使用持久卷保存任务数据库、报告与平台登录态。默认单实例、单工作队列，SQLite 保存任务；增加副本前需要共享数据库和跨进程任务协调。
+
+平台登录态由运营人员在服务器配置。容器启动、健康检查通过只说明进程可用；五平台会话校验通过后才能真实采集。浏览器服务不公开端口，管理与授权应通过受控运维通道操作。
+
+## 验证状态
+
+- 已完成：模拟浏览器与模拟模型的端到端验证，覆盖身份识别、提交任务、AI 判定字段、逐字证据与报告生成。
+- 待验证：Linux Docker 镜像实际构建、五平台真实登录及采集、主站身份联调。本次修改环境未安装 Docker，尚未执行镜像构建。
+- 当前源码仍包含历史工具和旧平台目录；上述服务器编排只使用所列服务和共享模块。完整的生产验收尚未完成。
+
+## 许可
+
+仓库保留部分上游 [Vigilath](https://github.com/sr007-cxy/Vigilath) 代码及其 MIT 声明，见 [LICENSE](LICENSE)。
