@@ -1,125 +1,80 @@
 # GEO 品牌监测中心
 
-GEO 品牌监测中心（`geo-brand-monitor`）用于记录品牌在 AI 回答中的提及、目标品牌排名、竞品排名和引用来源，并生成带问题明细和饼图的报告。
+GEO 品牌监测中心（`geo-brand-monitor`）：监测目标品牌与已发布文章在 **DeepSeek、豆包、元宝、文心一言、通义千问** 回答中的提及、排名、引用来源与品牌评价，生成带问题明细、引用证据和饼图的报告。
 
-当前网页工作台入口为 `/unified-monitor`，重点接入 DeepSeek、豆包、元宝、文心一言、通义千问。管理员登录后可以填写各模型服务的 HTTPS 请求地址、模型名和 API Key，并执行连接测试。API Key 在服务器上加密保存，不会随本仓库发布。
+**判定口径**：品牌是否提及、文章是否引用、品牌评价全部由配置的 AI 模型判定（判定结果必须附逐字证据，脚本校验证据真实性），不是脚本关键词匹配。
 
-模型 API 回答与对应 App、网页的回答可能不同。当前浏览器会话状态可查询，网页内扫码授权流程尚未接通；五个平台的真实 API 也尚未全部实测。部署与当前限制见 [网页监测工作台说明](docs/new-geo-monitor.md)。
+## 产品形态
 
-本项目基于 Vigilath 扩展，保留上游的 MIT 许可证及以下项目文档。
+### 桌面版（Windows）
 
-## Upstream: Vigilath
+入口 `GEO-Monitor.pyw`。浏览器登录五个平台，用同一批问题真实采集回答与引用来源，再由配置的模型逐题判定。品牌、文章链接、问题、登录态和历史报告保存在本机，报告为 `record.html` / `record.md` / `results.json`。
 
-Vigilath is an open-source GEO and AI-visibility platform for measuring how websites, brands, and content appear across generative search engines and AI assistants. It combines website audits, AI visibility measurement, citation analysis, brand monitoring, and content operations in one extensible stack.
+使用说明见 [QUICKSTART.md](QUICKSTART.md)。
 
-## Repository Navigation
+### 服务端嵌入模块（monitor-service）
 
-This repository contains the web application, audit engine, supporting services, and developer tooling.
+[`services/monitor-service/`](services/monitor-service/)：把桌面端监测核心（五平台浏览器采集 + AI 判定 + 报告）包装为可部署到服务器、可 iframe 嵌入订阅网站的**多租户服务**。
 
-- `frontend/`: React, TypeScript, and Vite web application.
-- `backend/geo/`: Main FastAPI application and API routes.
-- `backend/geo_checker/`: Active GEO audit package and CLI.
-- `backend/geo/agent/`: Isolated conversational agent.
-- `backend/api_engine/`: API-based AI engine adapters.
-- `backend/browser_engine/`: Browser-engine abstractions and session handling.
-- `services/`: Browser automation, telemetry, sentiment monitoring, and egress proxies.
-- `skills/vigilath-geo/`: Installable agent skill and standalone client.
-- `tests/integration/`: Playwright and SSE integration probes.
-- `docs/`: Architecture, deployment, operations, and user documentation.
+- 账号与收费由订阅网站负责：主站签发 HS256 JWT，模块按 `tenant_id` 隔离任务与报告
+- 可选配额钩子：提交任务时回调主站校验额度（计费单位：1 问题 = 5 次平台采集 + 1 次 AI 判定）
+- 五平台登录态与判定模型 Key 是运营资产，只存在于服务端
+- 判定与报告口径与桌面版完全一致
 
-For a detailed map of the documentation set, see [`docs/README.md`](docs/README.md). Start with [`docs/architecture.md`](docs/architecture.md) for the runtime model.
+接入方法（token 签发、iframe、配额协议、环境变量、Docker）见 [services/monitor-service/README.md](services/monitor-service/README.md)。
 
-## Core Capabilities
+## 仓库结构
 
-- **GEO auditing**: score websites across 25 technical, content, authority, discovery, and AI-readiness categories.
-- **AI visibility measurement**: query multiple AI engines and track mentions, rankings, citations, and answer coverage.
-- **AEO and citation analysis**: inspect answer-engine readiness, citation evidence, entities, and authority signals.
-- **Brand monitoring**: collect multi-source mentions, classify sentiment and risk, and support response workflows.
-- **Content operations**: expand queries, generate drafts, review content, schedule publication, and attribute citations.
-- **Agent workflows**: use a conversational agent for diagnostics and long-running GEO operations.
-- **API and CLI access**: run audits interactively, in CI, or through the FastAPI service.
+| 路径 | 说明 |
+| --- | --- |
+| `geo_monitor_gui.pyw` / `GEO-Monitor.pyw` | 桌面版界面与入口 |
+| `tools/` | 监测核心：采集编排（`geo_record`）、AI 判定（`ai_verifier`）、出题（`agent_planner`）、报告趋势 |
+| `services/browser-service/` | 五平台 Playwright 采集服务（含登录态管理、扫码授权、服务器镜像） |
+| `services/monitor-service/` | 服务端嵌入模块（FastAPI，多租户） |
+| `services/telemetry-service/` | 报告渲染（`qualified_report`）与品牌提及聚合 |
+| `reports/` | 本地监测报告（`geo-record-*`） |
+| `frontend/` / `backend/` | 上游 Vigilath 平台（GEO 审计引擎、历史 Web 工作台），非当前监测链路 |
+| `docs/` | 架构、部署、运维文档 |
 
-## New Web-First Monitor
+注意：`backend/geo/api/unified.py` 的旧 Web 工作台使用平台 API + 脚本正则判定，与桌面版 AI 判定口径不同，数据不可直接比较；新的服务端方案以 `monitor-service` 为准。
 
-The new API-first control console lives at [`/unified-monitor`](frontend/src/pages/UnifiedMonitor.tsx). It is backed by the unified routes in [`backend/geo/api/unified.py`](backend/geo/api/unified.py), which choose API engines before browser sessions and expose brand mention/ranking, pie-chart summaries, and citation ranking in one evidence report. See [`docs/new-geo-monitor.md`](docs/new-geo-monitor.md) and `docker-compose.server.yml` for the server deployment profile.
-## Quick Start
+## 快速开始
 
-For the five-platform GEO monitoring workflow and its readable report, see [QUICKSTART.md](QUICKSTART.md). The desktop entry point is `GEO-Monitor.pyw`; enter a brand, published article URLs, and keywords directly in the task form.
+桌面版依赖与运行见 [QUICKSTART.md](QUICKSTART.md)。服务端模块本地运行：
 
-### Prerequisites
-
-- Python 3.12 recommended for the backend; Python 3.9+ for the standalone CLI.
-- Node.js `^20.19.0 || >=22.12.0` and npm (required by the current Vite 8 frontend).
-- Git. Docker and Docker Compose are optional for local service orchestration.
-
-### CLI installation
-
-```bash
-python -m venv .venv
-.venv/bin/pip install -e .
-.venv/bin/geo-checker https://example.com
-```
-
-Common modes include `--compare`, `--crawl-test`, `--authority-audit`, `--aeo-visibility`, `--citation-check`, `--ai-visibility`, and `--entity`. JSON and HTML reports are supported; the PDF path is not production-ready.
-
-### Web application
-
-Start the backend:
-
-```bash
-cd backend
+```powershell
+cd services/monitor-service
 python -m venv venv
-venv/bin/pip install -r requirements.txt
-cp .env.example .env
-venv/bin/python -m uvicorn geo.main:app --host 127.0.0.1 --port 8070 --reload
+venv\Scripts\pip install -r requirements.txt
+$env:MONITOR_JWT_SECRET = "<与主站共享的密钥>"
+$env:MONITOR_ADMIN_TOKEN = "<运营令牌>"
+$env:GEO_AI_BASE_URL = "https://api.example.com/v1"
+$env:GEO_AI_MODEL = "<模型名>"
+$env:GEO_AI_API_KEY = "<判定模型 Key>"
+venv\Scripts\uvicorn monitor_service.main:app --port 8080
 ```
 
-In a second terminal, start the frontend:
+上游 Vigilath 的 CLI 审计（`geo-checker`）与 Web 应用仍可独立运行，见 [docs/README.md](docs/README.md)。
 
-```bash
-cd frontend
-npm ci
-npm run dev
-```
+## 安全与部署
 
-The Vite development server uses port 3000 and proxies `/api` to the backend.
+- 判定模型 Key、平台登录态、数据库口令等只放被忽略的本地环境文件或密钥管理器，不进仓库
+- 服务端部署置于 HTTPS 反向代理之后；对外服务必须开启鉴权与配额
+- 上游历史凭据已在改写 Git 历史时移除；分发副本前请删除旧克隆、备份与缓存
+- 漏洞报告见 [SECURITY.md](SECURITY.md)
 
-### Docker Compose
-
-```bash
-docker compose up --build
-```
-
-The root Compose stack is intended for local development. Agent, browser, telemetry, proxy, and payment services may require additional environment configuration.
-
-## Security and Deployment Considerations
-
-- Copy `backend/.env.example` to a local `.env`; never commit real credentials.
-- Store API keys, OAuth secrets, payment credentials, private keys, cookies, browser sessions, and database passwords in a secret manager or protected runtime environment.
-- Generate `SECRET_KEY` with a cryptographically secure random generator.
-- Configure explicit authentication, quotas, and account isolation before exposing services publicly.
-- Review [`docs/deployment-guide.md`](docs/deployment-guide.md) before deploying and [`SECURITY.md`](SECURITY.md) before reporting a vulnerability.
-- Historical credentials were removed from the rewritten Git history. Delete old clones, backups, and caches before distributing a copy.
-
-## Development and Testing
+## 开发
 
 ```bash
 python -m pytest
-cd frontend
-npm run lint
-npm run build
+cd frontend && npm run lint && npm run build
 ```
 
-Some integration tests require external services and credentials. Keep test fixtures synthetic and avoid recording customer data or browser sessions.
+贡献规范见 [CONTRIBUTING.md](CONTRIBUTING.md)。审计引擎的可修改副本为 `backend/geo_checker/`，规则见 [CLAUDE.md](CLAUDE.md)。
 
-## Support and Contribution
+## 上游致谢与许可证
 
-- Read the architecture, deployment, performance, and user guides under [`docs/`](docs/).
-- Report reproducible bugs and feature requests through GitHub Issues.
-- Submit focused pull requests with tests or a clear verification note.
-- Keep new maintained documentation in English and update [`docs/README.md`](docs/README.md) when adding or retiring documents.
-
-## Citation
+本项目的审计引擎与部分基础设施代码派生自 [Vigilath](https://github.com/sr007-cxy/Vigilath)（Zen7 Labs，MIT License）。依 MIT 条款保留其版权声明与许可证全文，见 [LICENSE](LICENSE)；相关上游文档一并保留在 `docs/`。
 
 ```bibtex
 @software{vigilath,
@@ -129,12 +84,3 @@ Some integration tests require external services and credentials. Keep test fixt
   url       = {https://github.com/sr007-cxy/Vigilath}
 }
 ```
-
-## License
-
-MIT License. See [`LICENSE`](LICENSE).
-
-
-
-
-The current preview opens the monitor directly. An administrator must sign in before using the unified API. Model API keys are created in the relevant provider console, saved through the monitor configuration form, and verified with the connection test action. Create the administrator from the backend directory with `python -m scripts.create_unified_admin`.
